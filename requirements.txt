@@ -1,0 +1,19 @@
+# API and Networking
+httpx
+python-dotenv
+gradio_client
+huggingface_hub
+
+# AI and Machine Learning
+groq
+assemblyai
+
+# Telegram Bot Framework
+python-telegram-bot
+
+# Media Processing
+opencv-python-headless
+pypdf
+
+# Database and Utilities
+# sqlite3 and json are built-in to Python and don't need to be listed
