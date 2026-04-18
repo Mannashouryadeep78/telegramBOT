@@ -1,19 +1,19 @@
-# API and Networking
-httpx
-python-dotenv
-gradio_client
-huggingface_hub
-
-# AI and Machine Learning
-groq
-assemblyai
+# AI Providers
+google-genai              # Gemini 2.5 Flash — chat, vision, OCR, JSON
+groq                      # Whisper v3 Turbo — audio transcription
+openai                    # OpenRouter fallback (OpenAI-compatible client)
+fal-client                # fal.ai — video generation (Kling / Wan 2.6)
 
 # Telegram Bot Framework
 python-telegram-bot
 
-# Media Processing
-opencv-python-headless
-pypdf
+# Networking & Utilities
+httpx
+python-dotenv
 
-# Database and Utilities
-# sqlite3 and json are built-in to Python and don't need to be listed
+# Media Processing
+opencv-python-headless    # Video frame extraction
+Pillow                    # Image handling for Gemini SDK
+pypdf                     # (kept for any legacy PDF use)
+
+# Database — sqlite3, json, io, base64 are all built into Python
