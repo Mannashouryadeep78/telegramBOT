@@ -2,7 +2,7 @@
 google-genai              # Gemini 2.5 Flash — chat, vision, OCR, JSON
 groq                      # Whisper v3 Turbo — audio transcription
 openai                    # OpenRouter fallback (OpenAI-compatible client)
-fal-client                # fal.ai — video generation (Kling / Wan 2.6)
+gradio_client              # Free Text-to-Video via HF Spaces (Zeroscope)
 
 # Telegram Bot Framework
 python-telegram-bot

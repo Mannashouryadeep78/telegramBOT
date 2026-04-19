@@ -41,12 +41,12 @@ or_client      = OpenAI(
     api_key=OPENROUTER_API_KEY
 )
 
-# fal.ai — imported lazily so missing package doesn't crash the bot
+# gradio_client for Free Video Generation
 try:
-    import fal_client
-    FAL_AVAILABLE = True
+    from gradio_client import Client as GradioClient
+    GRADIO_AVAILABLE = True
 except ImportError:
-    FAL_AVAILABLE = False
+    GRADIO_AVAILABLE = False
 
 # ─────────────────────────────────────────────
 # DATABASE
@@ -274,38 +274,37 @@ async def generate_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Please provide a prompt! Example: /generatevideo a cat playing piano")
         return
 
-    await update.message.reply_text("🎬 Generating your video via fal.ai (Wan 2.6)... This takes ~1-2 minutes.")
+    await update.message.reply_text("🎬 Generating your video via Hugging Face (Zeroscope)... This takes ~30-60 seconds.")
     await context.bot.send_chat_action(chat_id=chat_id, action="upload_video")
 
-    if not FAL_AVAILABLE:
-        await update.message.reply_text("⚠️ Video engine not installed. Run: pip install fal-client")
+    if not GRADIO_AVAILABLE:
+        await update.message.reply_text("⚠️ Video engine not installed. Run: pip install gradio_client")
         return
 
     try:
-        os.environ["FAL_KEY"] = FAL_KEY  # ensure env var is set for fal_client
-
-        def run_fal():
-            return fal_client.subscribe(
-                "fal-ai/wan/v2.6/1080p",
-                arguments={"prompt": prompt, "num_frames": 65},
+        def run_gradio():
+            client = GradioClient("hysts/zeroscope-v2")
+            result = client.predict(
+                prompt=prompt,
+                seed=0,
+                num_frames=24,
+                num_inference_steps=20,
+                api_name="/run"
             )
+            # result is a dict: {'video': '/path/to/video.mp4', 'subtitles': None}
+            return result['video']
 
-        result = await asyncio.to_thread(run_fal)
-        video_url = result["video"]["url"]
-
-        async with httpx.AsyncClient() as c:
-            r = await c.get(video_url, timeout=180.0)
-        if r.status_code == 200:
+        video_path = await asyncio.to_thread(run_gradio)
+        
+        with open(video_path, 'rb') as vf:
             await update.message.reply_video(
-                video=io.BytesIO(r.content),
+                video=vf,
                 caption=f"🎥 {prompt}"
             )
-        else:
-            raise Exception(f"Download failed: {r.status_code}")
 
     except Exception as e:
-        print(f"[video] fal.ai error: {e}")
-        await update.message.reply_text("⚠️ Video generation failed. Try a shorter, simpler prompt!")
+        print(f"[video] zeroscope error: {e}")
+        await update.message.reply_text("⚠️ Video generation failed. The free server might be busy, try again later!")
 
 # ─────────────────────────────────────────────
 # /explain — OCR via Gemini Vision
