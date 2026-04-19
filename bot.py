@@ -291,10 +291,19 @@ async def generate_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 num_inference_steps=20,
                 api_name="/run"
             )
-            # result is a dict: {'video': '/path/to/video.mp4', 'subtitles': None}
-            return result['video']
+            
+            # Gradio client return types vary by version (dict, tuple, or string path)
+            if isinstance(result, dict):
+                return result.get('video') or result.get('name') or str(result)
+            elif isinstance(result, (list, tuple)):
+                return result[0]
+            else:
+                return str(result)
 
         video_path = await asyncio.to_thread(run_gradio)
+        
+        if not video_path or not os.path.exists(video_path):
+            raise Exception(f"Video file missing or invalid result: {video_path}")
         
         with open(video_path, 'rb') as vf:
             await update.message.reply_video(
