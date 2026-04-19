@@ -607,4 +607,22 @@ if __name__ == '__main__':
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("[BOT] Running: Gemini 2.5 Flash | Groq Whisper | fal.ai | OpenRouter fallback")
+    
+    # Start a dummy web server on port 7860 for HuggingFace Spaces health check
+    import threading
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Bot is running!")
+
+    def run_health_server():
+        server = HTTPServer(('0.0.0.0', 7860), HealthCheckHandler)
+        server.serve_forever()
+
+    threading.Thread(target=run_health_server, daemon=True).start()
+    print("[BOT] Health check server started on port 7860")
+    
     app.run_polling()
