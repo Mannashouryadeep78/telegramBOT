@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: purple
 sdk: docker
 pinned: true
-license: mit
+license: other
 ---
 
 # 🤖 Multi-Modal AI Telegram Bot
